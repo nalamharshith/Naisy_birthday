@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Happy Birthday Navya</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Segoe UI', sans-serif;
+    background: black;
+    color: white;
+    text-align: center;
+}
+
+/* Countdown Screen */
+#countdownScreen {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, #000, #200000);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 120px;
+    font-weight: bold;
+    z-index: 999;
+}
+
+/* Main Party Screen */
+#party {
+    display: none;
+}
+
+canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+}
+
+.container {
+    position: relative;
+    z-index: 5;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 3em;
+    margin-top: 20px;
+    animation: glow 1s infinite alternate, shake 0.25s infinite;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 10px yellow; }
+    to { text-shadow: 0 0 40px white; }
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    75% { transform: translateX(-2px); }
+    100% { transform: translateX(0); }
+}
+
+.subtitle {
+    font-size: 1.6em;
+    animation: float 2.5s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0); }
+}
+
+.card {
+    background: rgba(255,255,255,0.15);
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 25px;
+    max-width: 520px;
+    animation: zoomIn 1.5s ease;
+    box-shadow: 0 0 30px rgba(255,255,255,0.3);
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.float {
+    position: fixed;
+    bottom: -100px;
+    font-size: 40px;
+    animation: rise linear infinite;
+    z-index: 1;
+}
+
+@keyframes rise {
+    from { transform: translateY(0); }
+    to { transform: translateY(-120vh); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- COUNTDOWN SCREEN -->
+<div id="countdownScreen">3</div>
+
+<!-- 🎵 Music -->
+<audio id="music" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+</audio>
+
+<!-- PARTY SCREEN -->
+<div id="party">
+    <canvas id="fireworks"></canvas>
+
+    <div class="container">
+        <h1>🎉 Happy Birthday Navya 🎉</h1>
+        <div class="subtitle">👩‍⚕️ The Future Doctor 👩‍⚕️</div>
+
+        <div class="card">
+            <p style="font-size:20px;">
+                🎂 Many many happy returns of the day Navya! 🎂<br><br>
+                May you become a great doctor and save many lives 🩺<br>
+                May your life be full of success, happiness and smiles 💖✨
+            </p>
+            <p>
+                With love,<br>
+                <b>From Nalam Harshith ❤️</b>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+// 🎯 Countdown logic
+let count = 3;
+const cd = document.getElementById("countdownScreen");
+const party = document.getElementById("party");
+const music = document.getElementById("music");
+
+let timer = setInterval(() => {
+    count--;
+    if (count > 0) {
+        cd.innerText = count;
+    } else {
+        cd.innerText = "💥 BOOM!";
+        setTimeout(() => {
+            cd.style.display = "none";
+            party.style.display = "block";
+            music.play();
+            startFireworks();
+            startEmojis();
+        }, 800);
+        clearInterval(timer);
+    }
+}, 1000);
+
+// 🎆 Fireworks
+function startFireworks() {
+    const canvas = document.getElementById("fireworks");
+    const ctx = canvas.getContext("2d");
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+
+    let particles = [];
+
+    function firework(x,y) {
+        for(let i=0;i<100;i++){
+            particles.push({
+                x,y,
+                vx:(Math.random()-0.5)*10,
+                vy:(Math.random()-0.5)*10,
+                life:100,
+                color:`hsl(${Math.random()*360},100%,60%)`
+            });
+        }
+    }
+
+    function animate(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        particles.forEach((p,i)=>{
+            p.x+=p.vx;
+            p.y+=p.vy;
+            p.life--;
+            ctx.fillStyle=p.color;
+            ctx.beginPath();
+            ctx.arc(p.x,p.y,3,0,Math.PI*2);
+            ctx.fill();
+            if(p.life<=0) particles.splice(i,1);
+        });
+        requestAnimationFrame(animate);
+    }
+
+    setInterval(()=>{
+        firework(Math.random()*canvas.width, Math.random()*canvas.height/2);
+    },600);
+
+    animate();
+}
+
+// 🎈 Floating Emojis
+function startEmojis() {
+    const emojis = ["🎈","🎂","💖","✨","🎁","🎊","❤️","🩺"];
+    setInterval(()=>{
+        let e = document.createElement("div");
+        e.className="float";
+        e.innerText = emojis[Math.floor(Math.random()*emojis.length)];
+        e.style.left = Math.random()*100+"%";
+        e.style.animationDuration = (6+Math.random()*6)+"s";
+        document.body.appendChild(e);
+        setTimeout(()=>e.remove(),12000);
+    },400);
+}
+</script>
+
+</body>
+</html>
